@@ -151,11 +151,11 @@ const AdminSideBar = ({ active }) => {
         >
           <CiMemoPad
             size={30}
-            color={`${active === 10 ? "crimson" : "#555"}`}
+            color={`${active === 9 ? "crimson" : "#555"}`}
           />
           <h5
             className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
-              active === 10 ? "text-[crimson]" : "text-[#555]"
+              active === 9 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
           Bài Viết
@@ -166,11 +166,11 @@ const AdminSideBar = ({ active }) => {
         <Link to="/dashboard-coupouns" className="w-full flex items-center">
           <AiOutlineGift
             size={30}
-            color={`${active === 9 ? "crimson" : "#555"}`}
+            color={`${active === 10 ? "crimson" : "#555"}`}
           />
           <h5
             className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
-              active === 9 ? "text-[crimson]" : "text-[#555]"
+              active === 10 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
             Mã Giảm Giá
@@ -184,11 +184,11 @@ const AdminSideBar = ({ active }) => {
         >
           <AiOutlineSetting
             size={30}
-            color={`${active === 12 ? "crimson" : "#555"}`}
+            color={`${active === 11 ? "crimson" : "#555"}`}
           />
           <h5
             className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
-              active === 12 ? "text-[crimson]" : "text-[#555]"
+              active === 11 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
             Cài Đặt

@@ -7,9 +7,8 @@ import axios from "axios";
 import { server } from "../server";
 import { toast } from "react-toastify";
 
-// cal API o day luon kieu gi no cx thanh cong
 
-const OrderSuccessPage = () => {
+const OrderSuccesssPage = () => {
   const createOrder = async (paymentInfo) => {
     const orderData = JSON.parse(localStorage.getItem("latestOrder"));
     const storedUserId = localStorage.getItem("userId");
@@ -32,7 +31,7 @@ const OrderSuccessPage = () => {
       paymentInfo,
     };
     try {
-      await axios.post(`${server}/order/create-order-vnpay`, order, config);
+      await axios.post(`${server}/order/create-order`, order, config);
       localStorage.setItem("cartItems", JSON.stringify([]));
       localStorage.setItem("latestOrder", JSON.stringify([]));
       toast.success("Đặt hàng thành công!");
@@ -43,7 +42,7 @@ const OrderSuccessPage = () => {
   };
   useEffect(() => {
     const paymentInfo = {
-      type: "Thanh Toán VNPay",
+      type: "Thanh Toán Bằng Tiền Mặt",
     };
     createOrder(paymentInfo);
   }, []);
@@ -78,4 +77,4 @@ const Success = () => {
   );
 };
 
-export default OrderSuccessPage;
+export default OrderSuccesssPage;

@@ -44,7 +44,6 @@ const shopSchema = new mongoose.Schema({
   },
   zipCode: {
     type: Number,
-    required: true,
   },
   isApproved: {
     type: Boolean,

@@ -76,7 +76,7 @@ const Payment = () => {
       await axios.post(`${server}/order/create-order`, order, config);
       localStorage.setItem("cartItems", JSON.stringify([]));
       localStorage.setItem("latestOrder", JSON.stringify([]));
-      navigate("/order/success");
+      navigate("/order/successs");
       toast.success("Đặt hàng thành công!");
     } catch (error) {
       console.error("Error creating order:", error);
@@ -133,10 +133,10 @@ const Payment = () => {
 
   const cashOnDeliveryHandler = async (e) => {
     e.preventDefault();
-    navigate("/order/success");
+    navigate("/order/successs");
 
     // const paymentInfo = {
-    //   type: "Cash On Delivery",
+    //   type: "Thanh Toán Bằng Tiền Mặt",
     // };
     // createOrder(paymentInfo);
   };

@@ -10,15 +10,13 @@ const Product = require("../model/product");
 router.post(
   "/create-order",
   catchAsyncErrors(async (req, res, next) => {
-    console.log(req.body);
-    
     try {
       const { cart, shippingAddress, user, totalPrice, paymentInfo } = req.body;
 
       if (!cart || !shippingAddress || !user || !totalPrice) {
         return res.status(400).json({ message: "Thiếu các trường bắt buộc" });
       }
-
+      const statusPayment = "1";
       const order = new Order({
         cart,
         shippingAddress: {
@@ -27,6 +25,7 @@ router.post(
         user,
         totalPrice,
         paymentInfo,
+        statusPayment
       });
 
       await order.save();
@@ -51,7 +50,7 @@ router.get(
   "/get-all-orders/:userId",
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const orders = await Order.find({ user: req.params.userId }).sort({
+      const orders = await Order.find({ user: req.params.userId,statusPayment: "1"}).sort({
         createdAt: -1,
       });
 
@@ -89,13 +88,49 @@ router.get(
   "/get-order/:id",
   catchAsyncErrors(async (req, res, next) => {
     try {
-      const order = await Order.findById(req.params.id).populate('cart.productId').populate('user').populate('shippingAddress');
+      const order = await Order.findOne({ _id: req.params.id, statusPayment: "1" }).populate('cart.productId').populate('user').populate('shippingAddress');
       if (!order) {
         return next(new ErrorHandler("Không tìm thấy đơn hàng có ID này", 404));
       }
 
       res.status(200).json({
         success: true,
+        order,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+router.put(
+  "/update-payment-status/:id",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const order = await Order.findById(req.params.id);
+
+      if (!order) {
+        return next(new ErrorHandler("Không tìm thấy đơn hàng với ID này", 404));
+      }
+      if (order.status !== "Xử lý") {
+        return res.status(400).json({
+          success: false,
+          message: "Đơn hàng không thể huỷ!",
+        });
+      }
+      if (order.statusPayment !== "1") {
+        return res.status(400).json({
+          success: false,
+          message: "Đơn hàng đã bị huỷ!",
+        });
+      }
+
+      order.statusPayment = "0";
+
+      await order.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Đã huỷ đơn hàng thành công!",
         order,
       });
     } catch (error) {
@@ -145,6 +180,44 @@ router.put(
   })
 );
 
+router.post(
+  "/create-order-vnpay",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { cart, shippingAddress, user, totalPrice, paymentInfo } = req.body;
+
+      if (!cart || !shippingAddress || !user || !totalPrice) {
+        return res.status(400).json({ message: "Thiếu các trường bắt buộc" });
+      }
+      const statusPayment = "1";
+
+      const order = new Order({
+        cart,
+        shippingAddress: {
+          ...shippingAddress,
+        },
+        user,
+        totalPrice,
+        paymentInfo,
+        statusPayment
+      });
+
+      await order.save();
+
+      res.status(201).json({
+        success: true,
+        message: "Đơn hàng đã được tạo thành công",
+        order,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Lỗi máy chủ",
+        error,
+      });
+    }
+  })
+);
 
 router.put(
   "/order-refund/:id",

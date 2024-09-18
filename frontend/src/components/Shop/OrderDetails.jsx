@@ -134,7 +134,7 @@ const OrderDetails = () => {
         </div>
         <div className="w-full 800px:w-[40%]">
           <h4 className="pt-3 text-[20px]">Thông tin thanh toán:</h4>
-          <h4>Trạng thái: {order.paymentInfo.status ? order.paymentInfo.status : "Chưa thanh toán"}</h4>
+          <h4>Trạng thái: {order.paymentInfo.type ? order.paymentInfo.type : "Chưa thanh toán"}</h4>
         </div>
       </div>
       <br />

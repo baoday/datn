@@ -16,10 +16,6 @@ export const navItems = [
     url: "/blogs",
   },
   {
-    title: "Hoạt Động",
-    url: "/events",
-  },
-  {
     title: "Hỏi & Đáp",
     url: "/faq",
   }

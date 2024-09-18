@@ -57,6 +57,7 @@ export const getAllOrdersOfAdmin = () => async (dispatch) => {
     const { data } = await axios.get(`${server}/order/admin-all-orders`, {
       withCredentials: true,
     });
+console.log(data);
 
     dispatch({
       type: "adminAllOrdersSuccess",

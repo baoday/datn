@@ -15,21 +15,24 @@ router.post("/create-user", async (req, res, next) => {
     const userEmail = await User.findOne({ email });
     const website = "http://localhost:3000";
     if (userEmail) {
-      return next(new ErrorHandler("User already exists", 400));
+      return next(new ErrorHandler("Người dùng đã tồn tại", 400));
     }
 
-    const myCloud = await cloudinary.v2.uploader.upload(avatar, {
-      folder: "avatars",
-    });
-
+    let avatarData = {};
+    if (avatar) {
+      const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+        folder: "avatars",
+      });
+      avatarData = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+    }
     const user = {
       name: name,
       email: email,
       password: password,
-      avatar: {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-      },
+      avatar: avatar ? avatarData : undefined,
     };
 
     const activationToken = createActivationToken(user);
@@ -260,11 +263,12 @@ router.put(
   isAuthenticated,
   catchAsyncErrors(async (req, res, next) => {
     try {
-      let existsUser = await User.findById(req.user.id);
-      if (req.body.avatar !== "") {
-        const imageId = existsUser.avatar.public_id;
+      const existsUser = await User.findById(req.user.id);
 
-        await cloudinary.v2.uploader.destroy(imageId);
+      if (req.body.avatar) {
+        if (existsUser.avatar && existsUser.avatar.public_id) {
+          await cloudinary.v2.uploader.destroy(existsUser.avatar.public_id);
+        }
 
         const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
           folder: "avatars",
@@ -288,6 +292,7 @@ router.put(
     }
   })
 );
+
 
 router.put(
   "/update-user-addresses",

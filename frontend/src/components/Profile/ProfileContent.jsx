@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { server } from "../../server";
 import styles from "../../styles/styles";
 import { DataGrid } from "@material-ui/data-grid";
-import { Button } from "@material-ui/core";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { MdTrackChanges } from "react-icons/md";
 import { RxCross1 } from "react-icons/rx";
@@ -172,7 +172,7 @@ const ProfileContent = ({ active }) => {
       {/* Refund */}
       {active === 3 && (
         <div>
-          <AllRefundOrders />
+         
         </div>
       )}
 
@@ -190,12 +190,6 @@ const ProfileContent = ({ active }) => {
         </div>
       )}
 
-      {/*  user Address */}
-      {active === 7 && (
-        <div>
-          <Address />
-        </div>
-      )}
     </div>
   );
 };
@@ -206,11 +200,46 @@ const AllOrders = () => {
   const { user } = useSelector((state) => state.user);
   const { orders } = useSelector((state) => state.order);
   const dispatch = useDispatch();
-
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   useEffect(() => {
     dispatch(getAllOrdersOfUser(user._id));
   }, [dispatch, user._id]);
+  const handleOpenDialog = (orderId) => {
+    setSelectedOrderId(orderId);
+    setOpenDialog(true);
+  };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedOrderId(null);
+  };
+  const handleCancelOrder = async () => {
+    if (selectedOrderId) {
+      try {
+        const response = await fetch(`${server}/order/update-payment-status/${selectedOrderId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          toast.success("Đơn hàng đã được hủy thành công");
+          handleCloseDialog();
+          window.location.reload();
+        } else {
+          toast.error(`${data.message}`);
+          handleCloseDialog();
+        }
+      } catch (error) {
+        toast.error("Có lỗi xảy ra khi hủy đơn hàng");
+      }
+    }
+  };
+  
   const columns = [
     { field: "id", headerName: "ID Đơn hàng", minWidth: 150, flex: 0.7 },
 
@@ -251,11 +280,19 @@ const AllOrders = () => {
       sortable: false,
       renderCell: (params) => {
         return (
+          <div>
           <Link to={`/user/order/${params.id}`}>
             <Button>
               <AiOutlineArrowRight size={20} />
             </Button>
           </Link>
+          <Button
+            onClick={() => handleOpenDialog(params.id)}
+            style={{ marginLeft: "10px", backgroundColor: "red", color: "white" }}
+          >
+            Hủy đơn
+          </Button>
+        </div>
         );
       },
     },
@@ -282,93 +319,22 @@ const AllOrders = () => {
         disableSelectionOnClick
         autoHeight
       />
-    </div>
-  );
-};
-const AllRefundOrders = () => {
-  const { user } = useSelector((state) => state.user);
-  const { orders } = useSelector((state) => state.order);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getAllOrdersOfUser(user._id));
-  }, []);
-
-  const eligibleOrders =
-    orders && orders.filter((item) => item.status === "Processing refund");
-
-  const columns = [
-    { field: "id", headerName: "ID Đơn hàng", minWidth: 150, flex: 0.7 },
-
-    {
-      field: "status",
-      headerName: "Trạng thái",
-      minWidth: 130,
-      flex: 0.7,
-      cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
-          ? "greenColor"
-          : "redColor";
-      },
-    },
-    {
-      field: "itemsQty",
-      headerName: "Số lượng mặt hàng",
-      type: "number",
-      minWidth: 130,
-      flex: 0.7,
-    },
-
-    {
-      field: "total",
-      headerName: "Tổng cộng",
-      type: "number",
-      minWidth: 130,
-      flex: 0.8,
-    },
-
-    {
-      field: " ",
-      flex: 1,
-      minWidth: 150,
-      headerName: "Hành động",
-      type: "number",
-      sortable: false,
-      renderCell: (params) => {
-        return (
-          <>
-            <Link to={`/user/order/${params.id}`}>
-              <Button>
-                <AiOutlineArrowRight size={20} />
-              </Button>
-            </Link>
-          </>
-        );
-      },
-    },
-  ];
-
-  const row = [];
-
-  eligibleOrders &&
-    eligibleOrders.forEach((item) => {
-      row.push({
-        id: item._id,
-        itemsQty: item.cart.length,
-        total: item.totalPrice + " đ",
-        status: item.status,
-      });
-    });
-
-  return (
-    <div className="pl-8 pt-1">
-      <DataGrid
-        rows={row}
-        columns={columns}
-        pageSize={10}
-        autoHeight
-        disableSelectionOnClick
-      />
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Xác nhận hủy đơn hàng</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Hủy bỏ
+          </Button>
+          <Button onClick={handleCancelOrder} color="secondary">
+            Xác nhận hủy
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

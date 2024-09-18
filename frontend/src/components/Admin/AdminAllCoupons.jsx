@@ -20,23 +20,58 @@ const AdminAllCoupon = () => {
   const [value, setValue] = useState(null);
   const dispatch = useDispatch();
 
- useEffect(() => {
-  setIsLoading(true);
-  axios
-    .get(`${server}/coupon/get-all-coupon`, {
-      withCredentials: true,
-    })
-    .then((res) => {
-      setIsLoading(false);
-      setCoupons(res.data.couponCodes);
-    })
-    .catch((error) => {
-      setIsLoading(false);
-      toast.error("Lỗi khi lấy dữ liệu coupon: " + error.message);
-    });
-}, [dispatch]);
+  useEffect(() => {
+    setIsLoading(true);
+    axios
+      .get(`${server}/coupon/get-all-coupon`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setIsLoading(false);
+        setCoupons(res.data.couponCodes);
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        toast.error("Lỗi khi lấy dữ liệu coupon: " + error.message);
+      });
+  }, [dispatch]);
+  const handleStockChange = (e) => {
+    const value = e.target.value;
 
-
+    if (value < 0) {
+      toast.error("Giảm giá không được là số âm!");
+      setValue("");
+    } else {
+      setValue(value);
+    }
+  };
+  const handleMinAmountChange = (e) => {
+    const value = e.target.value;
+  
+    if (value < 0) {
+      toast.error("Số tiền tối thiểu không được là số âm!");
+      setMinAmount("");
+    } else {
+      setMinAmount(value);
+    }
+  };
+  
+  const handleMaxAmountChange = (e) => {
+    const value = e.target.value;
+  
+    if (value < 0) {
+      toast.error("Số tiền tối đa không được là số âm!");
+      setMaxAmount("");
+    } else {
+      setMaxAmount(value);
+    }
+  };
+  const preventMinusInput = (e) => {
+    if (e.key === "-") {
+      e.preventDefault();
+    }
+  };
+  
   const handleDelete = async (id) => {
     axios
       .delete(`${server}/coupon/delete-coupon/${id}`, { withCredentials: true })
@@ -148,7 +183,7 @@ const AdminAllCoupon = () => {
                   />
                 </div>
                 <h5 className="text-[30px] font-Poppins text-center">
-                Tạo Mã Giảm Giá
+                  Tạo Mã Giảm Giá
                 </h5>
                 <form onSubmit={handleSubmit} aria-required={true}>
                   <br />
@@ -163,22 +198,23 @@ const AdminAllCoupon = () => {
                       value={name}
                       className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       onChange={(e) => setName(e.target.value)}
+                      
                       placeholder="Nhập tên mã phiếu giảm giá của bạn..."
                     />
                   </div>
                   <br />
                   <div>
                     <label className="pb-2">
-                    Phần trăm giảm giá{" "}
-                      <span className="text-red-500">*</span>
+                      Phần trăm giảm giá <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       name="value"
                       value={value}
+                      min="0"
                       required
                       className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      onChange={(e) => setValue(e.target.value)}
+                      onChange={handleStockChange}
                       placeholder="Nhập giá trị mã phiếu giảm giá của bạn..."
                     />
                   </div>
@@ -190,7 +226,8 @@ const AdminAllCoupon = () => {
                       name="minAmount"
                       value={minAmount}
                       className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      onChange={(e) => setMinAmount(e.target.value)}
+                      onChange={handleMinAmountChange}
+                      onKeyDown={preventMinusInput}
                       placeholder="Số tiền tối thiểu..."
                     />
                   </div>
@@ -202,8 +239,9 @@ const AdminAllCoupon = () => {
                       name="maxAmount"
                       value={maxAmount}
                       className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      onChange={(e) => setMaxAmount(e.target.value)}
+                      onChange={handleMaxAmountChange}
                       placeholder="Số tiền tối đa..."
+                      onKeyDown={preventMinusInput}
                     />
                   </div>
                   <br />

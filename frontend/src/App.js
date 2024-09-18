@@ -71,6 +71,7 @@ import axios from "axios";
 import { server } from "./server";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import OrderSuccesssPage from "./pages/OrderSuccesssPage.jsx";
 
 const App = () => {
   const [stripeApikey, setStripeApiKey] = useState("");
@@ -120,7 +121,6 @@ const App = () => {
         <Route path="/blogs" element={<BlogsPage />} />
         <Route path="/blogs/:id" element={<BlogDetailPage />} />
         <Route path="/best-selling" element={<BestSellingPage />} />
-        <Route path="/events" element={<EventsPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route
           path="/checkout"
@@ -131,6 +131,7 @@ const App = () => {
           }
         />
         <Route path="/order/success" element={<OrderSuccessPage />} />
+        <Route path="/order/successs" element={<OrderSuccesssPage />} />
         <Route
           path="/profile"
           element={

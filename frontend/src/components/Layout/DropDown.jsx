@@ -23,6 +23,7 @@ const DropDown = ({ setDropDown }) => {
   const submitHandle = (i) => {
     navigate(`/products?category=${i.title}`);
     setDropDown(false);
+    window.location.reload();
   };
 
   return (

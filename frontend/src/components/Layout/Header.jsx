@@ -34,13 +34,17 @@ const Header = ({ activeHeading }) => {
   const handleSearchChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
-
-    const filteredProducts =
-      allProducts &&
-      allProducts.filter((product) =>
-        product.name.toLowerCase().includes(term.toLowerCase())
-      );
-    setSearchData(filteredProducts);
+  
+    if (term.trim() === "") {
+      setSearchData(null);
+    } else {
+      const filteredProducts =
+        allProducts &&
+        allProducts.filter((product) =>
+          product.name.toLowerCase().includes(term.toLowerCase())
+        );
+      setSearchData(filteredProducts);
+    }
   };
 
   window.addEventListener("scroll", () => {
