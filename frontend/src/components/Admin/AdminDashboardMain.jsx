@@ -26,7 +26,8 @@ const AdminDashboardMain = () => {
   }, [dispatch]);
 
   const adminEarning = adminOrders && adminOrders.reduce((acc, item) => acc + item.totalPrice * 0.10, 0);
-  const adminBalance = adminEarning ? formatPrice(adminEarning.toFixed(2)) : "0";
+  const correctEarning = adminEarning * 10; // Nếu bị chia sai
+const adminBalance = formatPrice(correctEarning.toString());
 
   const columns = [
     { field: "id", headerName: "ID Đơn Hàng", minWidth: 150, flex: 0.7 },
